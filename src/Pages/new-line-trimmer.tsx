@@ -40,7 +40,8 @@ export default function NewLineTrimmer() {
         </Button>
         <textarea
           style={{ resize: 'vertical', width: '100%', minHeight: '20em' }}
-          value={n} />
+          value={n}
+          onChange={() => { }} />
       </Grid>
     </Grid>
   </>
