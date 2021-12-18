@@ -1,10 +1,12 @@
 import { DarkMode, LightMode, SettingsBrightness } from '@mui/icons-material';
-import { Box, Button, Container, CssBaseline, Grid, Link as MUILink, ToggleButton, ToggleButtonGroup, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button, Container, CssBaseline, Grid, ToggleButton, ToggleButtonGroup, Typography, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import React, { memo, createElement, useMemo, useState, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, Link, LinkProps, useResolvedPath, useMatch } from 'react-router-dom';
+import { memo, createElement, useMemo, useCallback } from 'react';
+import { BrowserRouter, Routes, Route, Link, LinkProps, useResolvedPath, useMatch } from 'react-router-dom';
+import useLocalStorage from 'use-local-storage';
 
 import NewLineTrimmer from './Pages/new-line-trimmer';
+import ResponsiveAppBar from './ResponsiveAppBar';
 
 const pages = [
   {
@@ -17,7 +19,7 @@ const pages = [
 type PaletteMode = 'light' | 'dark' | 'auto';
 
 function useDarkMode() {
-  const [mode, setMode] = useState<PaletteMode>('auto');
+  const [mode, setMode] = useLocalStorage<PaletteMode>('muiTheme', 'auto');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   
   const toggleMode = useCallback((mode?: PaletteMode) => {
@@ -35,23 +37,37 @@ function useDarkMode() {
     });
   }, [])
 
-  const theme = useMemo(() => createTheme({
-    palette: {
-      mode: 'light' || (mode === 'auto') ? (prefersDarkMode ? 'dark' : 'light') : mode,
+  const theme = useMemo(() => {
+    let m: 'light' | 'dark' = 'light';
+    switch (mode) {
+      case 'light':
+      case 'dark':
+        m = mode;
+        break;
+      default:
+        m = prefersDarkMode ? 'dark' : 'light'
+        break;
     }
-  }), [prefersDarkMode, mode])
+
+    return createTheme({
+      palette: {
+        mode: m,
+      }
+    })
+  }, [prefersDarkMode, mode])
 
   return { mode, setMode, toggleMode, theme };
 }
 
 function App() {
-  const { mode, setMode, toggleMode, theme } = useDarkMode();
+  const { mode, setMode, theme } = useDarkMode();
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box>
         <BrowserRouter basename={process.env.PUBLIC_URL}>
-          <Nav mode={mode} setMode={(s) => setMode(s)} />
+          {/* <Nav mode={mode} setMode={(s: any) => setMode(s)} /> */}
+          <ResponsiveAppBar darkmode={mode} setDarkmode={s => setMode(s)} pages={[{ name: 'Trimmer', path: 'trimmer' }]} />
           <Container>
             <Routes>
               <Route index element={<Container><h1>Text utils available:</h1><Index /></Container>} />
@@ -65,12 +81,10 @@ function App() {
   );
 }
 
-type NavProps = {
-  mode: PaletteMode,
-  setMode: (s: PaletteMode) => any,
-}
 
-const Nav = memo(function Nav({ mode, setMode }: NavProps) {
+
+const Nav = memo(function Nav({ mode, setMode }: any) {
+
   return <Box sx={{ bgcolor: 'primary.dark', px: 3 }}>
     <Grid container py={1} alignItems='center'>
       <Grid item flexGrow='1'>
@@ -82,7 +96,10 @@ const Nav = memo(function Nav({ mode, setMode }: NavProps) {
       </Grid>
 
       <Grid item>
-        <ToggleButtonGroup value={mode} onChange={(evt, m) => setMode(m)} >
+        <ToggleButtonGroup 
+          value={mode} 
+          exclusive
+          onChange={(evt, m) => setMode(m)} >
           <ToggleButton value='light'><LightMode /></ToggleButton>
           <ToggleButton value='auto'><SettingsBrightness /></ToggleButton>
           <ToggleButton value='dark'><DarkMode /></ToggleButton>
