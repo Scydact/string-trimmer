@@ -1,7 +1,6 @@
-import { AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Toolbar, Tooltip, Typography } from "@mui/material";
-import { DarkMode, LightMode, MenuOpen, Settings, SettingsBrightness, StoreMallDirectory } from '@mui/icons-material'
+import { AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, ToggleButton, ToggleButtonGroup, Toolbar, Typography } from "@mui/material";
+import { DarkMode, LightMode, MenuOpen, SettingsBrightness } from '@mui/icons-material'
 import { memo, useState } from "react";
-import { LinkProps, useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 
 type PaletteMode = 'light' | 'dark' | 'auto';
 
@@ -13,14 +12,13 @@ type Page = {
 type NavProps = {
   darkmode: PaletteMode,
   setDarkmode: (s: PaletteMode) => any,
-  pages: Page[]
+  pages?: Page[],
+  title?: string,
 }
 
 
-const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode }: NavProps) => {
-  const TITLE = 'Text Utils'
+const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode, title }: NavProps) => {
   const [isOpen, setOpen] = useState(false);
-  const navigate = useNavigate();
 
   const toggleDrawer = (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -52,12 +50,12 @@ const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode }: NavProps) => {
         {theming}
       </ListItem>
 
-      <ListItem>
+      {/* <ListItem>
         <Typography variant="h6">Utils</Typography>
-      </ListItem>
+      </ListItem> */}
 
-      <PageDrawerBtn page={{ name: 'Index', path: '/' }} />
-      {pages.map((page) => <PageDrawerBtn key={page.path} page={page} />)}
+      {/* <PageDrawerBtn page={{ name: 'Index', path: '/' }} /> */}
+      {/* {pages && pages.map((page) => <PageDrawerBtn key={page.path} page={page} />)} */}
     </List>
   </Box>
 
@@ -85,7 +83,7 @@ const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode }: NavProps) => {
       noWrap
       component="div"
       sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-      {TITLE}
+      {title}
     </Typography>
   </>
 
@@ -96,13 +94,13 @@ const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode }: NavProps) => {
       noWrap
       component="div"
       sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}>
-      {TITLE}
+      {title}
     </Typography>
 
 
-    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-      {pages.map((page) => <PageBtn key={page.path} page={page} />)}
-    </Box>
+    {/* <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+      {pages && pages.map((page) => <PageBtn key={page.path} page={page} />)}
+    </Box> */}
 
     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
       {theming}
@@ -121,32 +119,34 @@ const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode }: NavProps) => {
   );
 });
 
-function PageBtn({ page }: { page: Page }) {
-  const resolved = useResolvedPath(page.path)
-  const match = useMatch({ path: resolved.pathname, end: true })
-  const navigate = useNavigate();
+// Use with react-router to hightligh current link
+// function PageBtn({ page }: { page: Page }) {
+//   const resolved = useResolvedPath(page.path)
+//   const match = useMatch({ path: resolved.pathname, end: true })
+//   const navigate = useNavigate();
 
-  return <Button
-    key={page.name}
-    sx={{ my: 2, color: 'white', display: 'block' }}
-    disabled={!!match}
-    onClick={() => navigate(page.path)}>
-    {page.name}
-  </Button>
-}
+//   return <Button
+//     key={page.name}
+//     sx={{ my: 2, color: 'white', display: 'block' }}
+//     disabled={!!match}
+//     onClick={() => navigate(page.path)}>
+//     {page.name}
+//   </Button>
+// }
 
-function PageDrawerBtn({ page }: { page: Page }) {
-  const resolved = useResolvedPath(page.path)
-  const match = useMatch({ path: resolved.pathname, end: true })
-  const navigate = useNavigate();
+// Use with react-router to hightligh current link
+// function PageDrawerBtn({ page }: { page: Page }) {
+//   const resolved = useResolvedPath(page.path)
+//   const match = useMatch({ path: resolved.pathname, end: true })
+//   const navigate = useNavigate();
 
-  return <ListItem
-    button
-    key={page.path}
-    selected={!!match}
-    onClick={() => navigate(page.path)}>
-    {page.name}
-  </ListItem>
-}
+//   return <ListItem
+//     button
+//     key={page.path}
+//     selected={!!match}
+//     onClick={() => navigate(page.path)}>
+//     {page.name}
+//   </ListItem>
+// }
 
 export default ResponsiveAppBar;

@@ -1,4 +1,4 @@
-import { Backspace, ContentCopy, ContentCut, ContentPaste,  Redo, Undo, FilterNone, Filter2 } from "@mui/icons-material";
+import { Backspace, ContentCopy, ContentCut, ContentPaste,  Redo, Undo, FilterNone, Filter2, Filter5 } from "@mui/icons-material";
 import { Box, Button, ButtonGroup, ButtonProps, Container, Grid, TextField, Tooltip, useMediaQuery } from "@mui/material";
 import { useDebounce } from "@react-hook/debounce";
 import React, { useCallback, useEffect, useState } from "react";
@@ -39,6 +39,14 @@ const actions: ThisAction[] = [
     fn: function (t: string) { return t.replaceAll(/(\r?\n){2}/g, '\n') },
     props: {
       startIcon: (<Filter2 />)
+    },
+  },
+  {
+    name: 'Trim max 5',
+    description: 'Trim 5 consecutive new lines.',
+    fn: function (t: string) { return t.replaceAll(/(\r?\n){5,}/g, '\n'.repeat(5)) },
+    props: {
+      startIcon: (<Filter5 />)
     },
   },
   {
@@ -164,7 +172,6 @@ export default function NewLineTrimmer() {
 
 
   return (<Container >
-    <h1>New Line Trimmer™ 3000©</h1>
     <Box>
       <Buttons />
     </Box>
