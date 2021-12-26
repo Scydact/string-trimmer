@@ -114,14 +114,6 @@ export default function OptsModal({ separators: rows, setSeparators: setRows, ..
       changedRows = rows.filter(row => !deletedSet.has(row.id))
     }
 
-    console.log({
-      added,
-      changed,
-      deleted,
-      rows,
-      changedRows,
-    })
-
     setRows(changedRows)
   }, [rows, setRows])
 
@@ -155,7 +147,6 @@ export default function OptsModal({ separators: rows, setSeparators: setRows, ..
           }}
           rowComponent={({ row, ...rest }) => {
             const TableRow = SortableElement(Table.Row)
-            console.log(row, rows)
             return <TableRow
               {...rest}
               row={row}

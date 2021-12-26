@@ -1,4 +1,5 @@
 import { createUUID } from "../../../hooks/utils";
+import { StringAction } from "../create-action-btn";
 
 export const SEPARATOR_AT_TYPES = [
   'start', 
@@ -22,14 +23,34 @@ export function createSeparator({ char, length: l = DEFAULT_LEN }: SeparatorDef)
   return s
 }
 
-function createSeparatorFuntion(sep: SeparatorDef): (t: string, p: number) => string {
+function createSeparatorFuntion(sep: SeparatorDef, getCursor: () => number): (t: string) => string {
   const o = createSeparator(sep)
   switch (sep.at) {
     case 'start': return function (t: string) { return o + '\n' + t }
     case 'end': return function (t: string) { return t + '\n' + o }
-    case 'cursor': return function (t: string, p: number) {
-      console.log(`cursor at ${p}`)
-      return t
+    case 'cursor': return function (t: string) {
+      const p = getCursor()
+
+      const before = t[p-1]
+      const current = t[p]
+
+      // case: this is at the start of the text
+      if (before === undefined)
+        return t.slice(0, p) + o + '\n' + t.slice(p)
+
+      // case: this is at the end of the file
+      if (current === undefined)
+        return t.slice(0, p) + '\n' + o + t.slice(p)
+
+      // case: this is a new line
+      if (before === '\n' && current === '\n')
+        return t.slice(0, p) + o + t.slice(p)
+
+      // case: this is at the end of a line
+      if (before !== '\n' && current === '\n')
+        return t.slice(0, p) + '\n' + o + t.slice(p)
+
+      return t.slice(0, p) + '\n' + o + '\n' + t.slice(p)
     }
     default: return function (t) { return t }
   }
@@ -49,10 +70,10 @@ function getSeparatorTitle(sep: SeparatorDef) {
   switch (sep.at) {
     case 'start': return <div>
       <div>{o}</div>
-      <div>txt</div>
+      <div>TXT</div>
     </div>
     case 'end': return <div>
-      <div>txt</div>
+      <div>TXT</div>
       <div>{o}</div>
     </div>
     case 'cursor':
@@ -60,13 +81,17 @@ function getSeparatorTitle(sep: SeparatorDef) {
   }
 }
 
-export function createSeparatorAction(sep: SeparatorDef) {
+export function createSeparatorAction(sep: SeparatorDef, getCursor: () => number) {
   return {
     name: getSeparatorTitle(sep),
     description: getSeparatorDescription(sep),
-    fn: createSeparatorFuntion(sep),
-    props: {},
-  }
+    fn: createSeparatorFuntion(sep, getCursor),
+    props: {
+      style: {
+        textTransform: "none",
+      }
+    },
+  } as StringAction
 }
 
 

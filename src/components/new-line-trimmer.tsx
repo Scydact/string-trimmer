@@ -1,9 +1,11 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import useUndo from "use-undo";
+import { useDebounce } from "@react-hook/debounce";
+
 import { Backspace, ContentCopy, ContentPaste,  Redo, Undo} from "@mui/icons-material";
 import { Box, Button, ButtonGroup, Container, Grid, TextField, Tooltip, useMediaQuery } from "@mui/material";
-import { useDebounce } from "@react-hook/debounce";
-import React, { useCallback, useEffect, useState } from "react";
-import useUndo from "use-undo";
-import { createActionBtn, StringAction } from "./operations/create-action-btn";
+
+import { createActionBtn } from "./operations/create-action-btn";
 import SeparatorActionBtns from "./operations/separators/btns";
 import trimActions from "./operations/trim";
 
@@ -23,17 +25,30 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 export default function NewLineTrimmer() {
   const [text, setText] = useState(LOREM);
   const [debouncedText, setDebouncedText, setDebouncedTextNow] = useDebounce(text, 400);
-
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
   const [textState, { set, undo, redo, canUndo, canRedo }] = useUndo(text);
   const [copied, setCopied] = useState(false);
-
   const isSmallScreen = useMediaQuery('(max-width: 440px)');
-
+  
   // On textarea change
   const onChange = useCallback((evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(evt.target.value);
     setDebouncedText(evt.target.value);
     setCopied(false);
+  }, [])
+
+  const getCursorPosition = useCallback(() => {
+    if (!textareaRef.current) return 0
+    const ta = textareaRef.current
+    const p = ta.selectionStart
+    // Set the cursor back to where it was.
+    ta.focus()
+    // must defer to after the change was applied
+    setTimeout(() => {
+      ta.selectionEnd = p
+    }, 0) 
+    return p
   }, [])
 
 
@@ -94,7 +109,7 @@ export default function NewLineTrimmer() {
     </ButtonGroup>
 
     {/* Separator actions */}
-    <SeparatorActionBtns text={text} set={set} />
+    <SeparatorActionBtns text={text} set={set} getCursor={getCursorPosition} />
   </Grid>
 
 
@@ -105,6 +120,7 @@ export default function NewLineTrimmer() {
     <br />
     <Box>
       <TextField
+        inputRef={textareaRef}
         multiline
         label='Text to trim'
         placeholder={LOREM}
