@@ -4,10 +4,12 @@ import useDarkMode from './hooks/use-darkmode';
 
 import NewLineTrimmer from './components/new-line-trimmer';
 import ResponsiveAppBar from './components/AppNav';
+import { useEffect } from 'react';
 
 
 function App() {
   const { mode, setMode, theme } = useDarkMode();
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

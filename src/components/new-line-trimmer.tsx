@@ -1,8 +1,11 @@
-import { Backspace, ContentCopy, ContentCut, ContentPaste,  Redo, Undo, FilterNone, Filter2, Filter5 } from "@mui/icons-material";
-import { Box, Button, ButtonGroup, ButtonProps, Container, Grid, TextField, Tooltip, useMediaQuery } from "@mui/material";
+import { Backspace, ContentCopy, ContentPaste,  Redo, Undo} from "@mui/icons-material";
+import { Box, Button, ButtonGroup, Container, Grid, TextField, Tooltip, useMediaQuery } from "@mui/material";
 import { useDebounce } from "@react-hook/debounce";
 import React, { useCallback, useEffect, useState } from "react";
 import useUndo from "use-undo";
+import { createActionBtn, StringAction } from "./operations/create-action-btn";
+import SeparatorActionBtns from "./operations/separators/btns";
+import trimActions from "./operations/trim";
 
 const LOREM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
 
@@ -16,80 +19,6 @@ Excepteur sint occaecat cupidatat non proident,
 
 sunt in culpa qui officia deserunt mollit anim id est laborum.
 `
-
-type ThisAction = {
-  name: React.ReactNode,
-  description: React.ReactNode,
-  fn: Function,
-  props: ButtonProps,
-}
-
-const actions: ThisAction[] = [
-  {
-    name: 'Trim all',
-    description: 'Trim all spaces, leaving only single new lines.',
-    fn: function (t: string) { return t.replaceAll(/(\r?\n){2,}/g, '\n') },
-    props: {
-      startIcon: (<FilterNone />)
-    },
-  },
-  {
-    name: 'Trim doubles',
-    description: 'Trim double spaces, fixing formatting on Office text.',
-    fn: function (t: string) { return t.replaceAll(/(\r?\n){2}/g, '\n') },
-    props: {
-      startIcon: (<Filter2 />)
-    },
-  },
-  {
-    name: 'Trim max 5',
-    description: 'Trim 5 consecutive new lines.',
-    fn: function (t: string) { return t.replaceAll(/(\r?\n){5,}/g, '\n'.repeat(5)) },
-    props: {
-      startIcon: (<Filter5 />)
-    },
-  },
-  {
-    name: 'Traditional trim',
-    description: 'Simply trim each line.',
-    fn: function (t: string) { return t.split('\n').map(x => x.trim()).join('\n').trim() },
-    props: {
-      startIcon: (<ContentCut />)
-    },
-  },
-]
-
-const SepBeforeFactory = (s: string, n = 80) => ({
-  name: <>{s.repeat(3)}<br />txt</>,
-  description: `Adds ${n} ${s.repeat(3)} before the text`,
-  fn: function (t: string) { return s.repeat(n) + '\n' + t },
-  props: {},
-})
-const SepAfterFactory = (s: string, n = 80) => ({
-  name: <>txt<br />{s.repeat(3)}</>,
-  description: `Adds ${n} ${s.repeat(3)} after the text`,
-  fn: function (t: string) { return t + '\n' + s.repeat(n) },
-  props: {},
-})
-
-const separators: ThisAction[] = [
-  SepBeforeFactory('-'),
-  SepBeforeFactory('='),
-  SepAfterFactory('-'),
-  SepAfterFactory('=',)
-]
-
-function createActionBtn(text: string, set: (s: string) => void, actions: ThisAction[]) {
-  return actions.map((x, i) => <Tooltip key={i} title={x.description || ''}>
-    <Button
-      onClick={() => set(x.fn(text))}
-      disabled={(text === x.fn(text))}
-      {...x.props}>
-      {x.name}
-    </Button>
-  </Tooltip>
-  )
-}
 
 export default function NewLineTrimmer() {
   const [text, setText] = useState(LOREM);
@@ -161,13 +90,11 @@ export default function NewLineTrimmer() {
 
     {/* Trim actions */}
     <ButtonGroup variant='contained' orientation={isSmallScreen ? 'vertical' : 'horizontal'}>
-      {createActionBtn(text, set, actions)}
+      {createActionBtn(text, set, trimActions)}
     </ButtonGroup>
 
     {/* Separator actions */}
-    <ButtonGroup variant='contained' sx={{ flexWrap: 'wrap' }}>
-      {createActionBtn(text, set, separators)}
-    </ButtonGroup>
+    <SeparatorActionBtns text={text} set={set} />
   </Grid>
 
 
