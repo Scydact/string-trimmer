@@ -14,13 +14,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box>
-        <ResponsiveAppBar 
+        <ResponsiveAppBar
           title="String Trimmer 3010™"
-          darkmode={mode} 
+          darkmode={mode}
           setDarkmode={s => setMode(s)} />
-        <Box my={3}>
-          <NewLineTrimmer />
-        </Box>
+        <NewLineTrimmer />
       </Box>
     </ThemeProvider>
 

@@ -66,7 +66,7 @@ export default function NewLineTrimmer() {
     setCopied(false);
   }, [textState.present]);
 
-  const Buttons = () => <Grid container gap={2}>
+  const Buttons = () => <Grid container gap={2} my={3}>
     {/* Undo/Redo */}
     <ButtonGroup variant='contained'>
       <Tooltip title='Undo'><Button onClick={undo} disabled={!canUndo}><Undo /></Button></Tooltip>
@@ -113,20 +113,18 @@ export default function NewLineTrimmer() {
   </Grid>
 
 
-  return (<Container >
+  return (<Container>
     <Box>
       <Buttons />
     </Box>
-    <br />
-    <Box>
-      <TextField
-        inputRef={textareaRef}
-        multiline
-        label='Text to trim'
-        placeholder={LOREM}
-        style={{ width: '100%' }}
-        value={text}
-        onChange={onChange} />
-    </Box>
+    <TextField
+      inputRef={textareaRef}
+      multiline
+      label='Text to trim'
+      placeholder={LOREM}
+      style={{ width: '100%' }}
+      maxRows={25}
+      value={text}
+      onChange={onChange} />
   </Container>)
 }

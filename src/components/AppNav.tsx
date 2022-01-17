@@ -93,7 +93,7 @@ const ResponsiveAppBar = memo(({ pages, darkmode, setDarkmode, title }: NavProps
       variant="h6"
       noWrap
       component="div"
-      sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}>
+      sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, flexGrow: 1 }}>
       {title}
     </Typography>
 
